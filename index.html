@@ -1,0 +1,539 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurelia Tea | Artisan Luxury Blends</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.8/index.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/index.min.css">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f4e4a6;
+            --dark: #0a0a0a;
+            --dark-card: #141414;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Ken Burns Effect for Hero */
+        .hero-bg {
+            animation: kenburns 20s ease-in-out infinite alternate;
+        }
+        @keyframes kenburns {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.15) translate(-2%, -2%); }
+        }
+
+        /* Steam Animation */
+        .steam-container {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .steam {
+            position: absolute;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: steamRise 4s ease-in infinite;
+            opacity: 0;
+        }
+        .steam:nth-child(1) { left: 45%; width: 80px; height: 80px; animation-delay: 0s; }
+        .steam:nth-child(2) { left: 50%; width: 100px; height: 100px; animation-delay: 1s; }
+        .steam:nth-child(3) { left: 55%; width: 70px; height: 70px; animation-delay: 2s; }
+        .steam:nth-child(4) { left: 48%; width: 90px; height: 90px; animation-delay: 3s; }
+        .steam:nth-child(5) { left: 52%; width: 110px; height: 110px; animation-delay: 1.5s; }
+        
+        @keyframes steamRise {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-300px) scale(2); opacity: 0; }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        /* Reveal on Scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Product Card Hover */
+        .product-card {
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+        .product-card:hover .product-img {
+            transform: scale(1.08);
+        }
+        .product-img {
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Gold Button */
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%);
+            color: #0a0a0a;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-gold::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-gold:hover::before {
+            left: 100%;
+        }
+        .btn-gold:hover {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            transform: scale(1.02);
+        }
+
+        /* Cart Drawer */
+        .cart-drawer {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .cart-drawer.open {
+            transform: translateX(0);
+        }
+        .cart-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .cart-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
+
+        /* Divider */
+        .gold-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-500" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="#" class="text-2xl serif tracking-widest text-white font-bold">AURELIA<span class="text-[#d4af37]">.</span></a>
+            <div class="hidden md:flex space-x-8 text-sm tracking-widest uppercase">
+                <a href="#collection" class="hover:text-[#d4af37] transition-colors">Collection</a>
+                <a href="#story" class="hover:text-[#d4af37] transition-colors">Our Story</a>
+                <a href="#contact" class="hover:text-[#d4af37] transition-colors">Contact</a>
+            </div>
+            <button onclick="toggleCart()" class="relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white group-hover:text-[#d4af37] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-[#d4af37] text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center opacity-0 transition-opacity">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen w-full overflow-hidden flex items-center justify-center">
+        <!-- Background Image with Ken Burns -->
+        <div class="absolute inset-0 hero-bg">
+            <img src="https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/1ba5639db-8276-4efd-911b-6ee9dd4674bc.png" 
+                 alt="Tea Making" 
+                 class="w-full h-full object-cover">
+        </div>
+        
+        <!-- Dark Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-[#0a0a0a]"></div>
+        
+        <!-- Steam Animation Overlay -->
+        <div class="steam-container">
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <p class="text-[#d4af37] tracking-[0.4em] text-sm md:text-base uppercase mb-6 animate-[fadeIn_1.5s_ease-out]">Est. 1892 • Artisan Blends</p>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
+                The Art of <br>
+                <span class="italic text-[#f4e4a6]">Brewing Luxury</span>
+            </h1>
+            <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+                Handcrafted from the world's finest leaves and rare spices. Experience tea as it was meant to be — rich, aromatic, and unforgettable.
+            </p>
+            <a href="#collection" class="btn-gold inline-block px-10 py-4 rounded-full text-sm font-bold tracking-widest uppercase">
+                Shop Collection
+            </a>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 scroll-indicator flex flex-col items-center gap-2 cursor-pointer" onclick="document.getElementById('collection').scrollIntoView({behavior: 'smooth'})">
+            <span class="text-xs tracking-widest uppercase text-gray-400">Scroll to Discover</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Story Section -->
+    <section id="story" class="py-24 px-6 bg-[#0a0a0a]">
+        <div class="max-w-5xl mx-auto text-center reveal">
+            <p class="text-[#d4af37] tracking-[0.3em] text-sm uppercase mb-4">Our Philosophy</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Crafted with Obsession</h2>
+            <div class="gold-divider w-24 mx-auto mb-10"></div>
+            <p class="text-gray-400 text-lg leading-relaxed max-w-3xl mx-auto">
+                Every cup of Aurelia tea begins with a ritual. We source single-origin leaves from the misty highlands of Darjeeling, the sun-drenched gardens of Ceylon, and the ancient forests of Assam. Blended by master artisans using time-honored techniques, our teas are a symphony of flavor — steeped in tradition, elevated by luxury.
+            </p>
+        </div>
+    </section>
+
+    <!-- Collection / Purchase Section -->
+    <section id="collection" class="py-24 px-6 bg-gradient-to-b from-[#0a0a0a] to-[#111111]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 reveal">
+                <p class="text-[#d4af37] tracking-[0.3em] text-sm uppercase mb-4">The Collection</p>
+                <h2 class="text-4xl md:text-6xl font-bold text-white mb-6">Signature Blends</h2>
+                <div class="gold-divider w-24 mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+                <!-- Product 1: Masala Chai -->
+                <div class="product-card group reveal">
+                    <div class="relative overflow-hidden rounded-2xl mb-6 bg-[#1a1a1a] aspect-square">
+                        <img src="https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/1c83d3f35-83d7-45bb-a7b8-27a4ecb7c917.png" 
+                             alt="Masala Chai" 
+                             class="product-img w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute top-4 right-4 bg-[#d4af37] text-black text-xs font-bold px-3 py-1 rounded-full">BESTSELLER</div>
+                    </div>
+                    <div class="px-2">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-2xl serif text-white group-hover:text-[#f4e4a6] transition-colors">Royal Masala Chai</h3>
+                            <span class="text-[#d4af37] text-xl font-bold">$28</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed">A bold symphony of Assam black tea, cardamom, cinnamon, clove, and fresh ginger. Perfectly spiced for the discerning palate.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider">100g Tin</span>
+                            <button onclick="addToCart('Royal Masala Chai', 28, 'https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/1c83d3f35-83d7-45bb-a7b8-27a4ecb7c917.png')" 
+                                    class="btn-gold px-6 py-3 rounded-full text-xs font-bold tracking-widest uppercase">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2: Earl Grey -->
+                <div class="product-card group reveal" style="transition-delay: 0.15s;">
+                    <div class="relative overflow-hidden rounded-2xl mb-6 bg-[#1a1a1a] aspect-square">
+                        <img src="https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/18ce04f9f-3117-4743-8c9d-2215889af956.png" 
+                             alt="Earl Grey" 
+                             class="product-img w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div class="px-2">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-2xl serif text-white group-hover:text-[#f4e4a6] transition-colors">Imperial Earl Grey</h3>
+                            <span class="text-[#d4af37] text-xl font-bold">$32</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed">Ceylon black tea infused with natural Italian bergamot oil and delicate cornflower petals. A timeless classic, reimagined.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider">100g Tin</span>
+                            <button onclick="addToCart('Imperial Earl Grey', 32, 'https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/18ce04f9f-3117-4743-8c9d-2215889af956.png')" 
+                                    class="btn-gold px-6 py-3 rounded-full text-xs font-bold tracking-widest uppercase">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3: Green Tea -->
+                <div class="product-card group reveal" style="transition-delay: 0.3s;">
+                    <div class="relative overflow-hidden rounded-2xl mb-6 bg-[#1a1a1a] aspect-square">
+                        <img src="https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/11990094e-e1b2-423c-b2ca-b5d5210d38f9.png" 
+                             alt="Green Tea" 
+                             class="product-img w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute top-4 right-4 bg-white/10 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20">NEW</div>
+                    </div>
+                    <div class="px-2">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-2xl serif text-white group-hover:text-[#f4e4a6] transition-colors">Emerald Jade</h3>
+                            <span class="text-[#d4af37] text-xl font-bold">$35</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed">Hand-picked first-flush green tea leaves from the misty mountains of Japan. Delicate, vegetal, and profoundly refreshing.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider">80g Tin</span>
+                            <button onclick="addToCart('Emerald Jade', 35, 'https://image.qwenlm.ai/public_source/feff2597-f598-4990-90f2-1a0f3b7b0041/11990094e-e1b2-423c-b2ca-b5d5210d38f9.png')" 
+                                    class="btn-gold px-6 py-3 rounded-full text-xs font-bold tracking-widest uppercase">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-6 bg-[#0a0a0a] border-t border-white/5">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div class="reveal">
+                <div class="text-[#d4af37] text-4xl mb-4">✦</div>
+                <h4 class="text-xl serif text-white mb-3">Single Origin</h4>
+                <p class="text-gray-500 text-sm">Sourced directly from heritage estates across the world's finest tea regions.</p>
+            </div>
+            <div class="reveal" style="transition-delay: 0.15s;">
+                <div class="text-[#d4af37] text-4xl mb-4">✦</div>
+                <h4 class="text-xl serif text-white mb-3">Hand Blended</h4>
+                <p class="text-gray-500 text-sm">Each batch is crafted by master blenders with over 30 years of experience.</p>
+            </div>
+            <div class="reveal" style="transition-delay: 0.3s;">
+                <div class="text-[#d4af37] text-4xl mb-4">✦</div>
+                <h4 class="text-xl serif text-white mb-3">Free Shipping</h4>
+                <p class="text-gray-500 text-sm">Complimentary worldwide delivery on all orders over $50.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="py-16 px-6 bg-black border-t border-white/5">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div class="md:col-span-2">
+                <h3 class="text-2xl serif text-white font-bold mb-4">AURELIA<span class="text-[#d4af37]">.</span></h3>
+                <p class="text-gray-500 text-sm leading-relaxed max-w-md mb-6">
+                    Elevating the tea experience since 1892. Join our newsletter for exclusive blends, brewing guides, and early access to limited editions.
+                </p>
+                <div class="flex max-w-md">
+                    <input type="email" placeholder="Your email address" class="flex-1 bg-white/5 border border-white/10 rounded-l-full px-5 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d4af37]">
+                    <button class="btn-gold px-6 rounded-r-full text-xs font-bold tracking-widest uppercase">Join</button>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-white uppercase tracking-widest mb-4">Shop</h4>
+                <ul class="space-y-3 text-sm text-gray-500">
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">All Teas</a></li>
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Gift Sets</a></li>
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Accessories</a></li>
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Subscriptions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-white uppercase tracking-widest mb-4">Company</h4>
+                <ul class="space-y-3 text-sm text-gray-500">
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Our Story</a></li>
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Sustainability</a></li>
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-[#d4af37] transition-colors">Press</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600">
+            <p>© 2026 Aurelia Tea Co. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-[#d4af37] transition-colors">Privacy</a>
+                <a href="#" class="hover:text-[#d4af37] transition-colors">Terms</a>
+                <a href="#" class="hover:text-[#d4af37] transition-colors">Shipping</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Overlay -->
+    <div id="cart-overlay" class="cart-overlay fixed inset-0 bg-black/80 backdrop-blur-sm z-50" onclick="toggleCart()"></div>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer" class="cart-drawer fixed top-0 right-0 h-full w-full max-w-md bg-[#141414] z-50 shadow-2xl flex flex-col border-l border-white/5">
+        <div class="p-6 border-b border-white/5 flex justify-between items-center">
+            <h3 class="text-2xl serif text-white">Your Cart</h3>
+            <button onclick="toggleCart()" class="text-gray-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <div id="empty-cart" class="text-center text-gray-500 mt-20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <p class="serif text-xl">Your cart is empty</p>
+                <p class="text-sm mt-2">Add some luxury to your life.</p>
+            </div>
+        </div>
+
+        <div id="cart-footer" class="p-6 border-t border-white/5 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-400 uppercase tracking-widest text-sm">Subtotal</span>
+                <span id="cart-total" class="text-2xl serif text-[#d4af37] font-bold">$0</span>
+            </div>
+            <button class="btn-gold w-full py-4 rounded-full text-sm font-bold tracking-widest uppercase">
+                Checkout
+            </button>
+            <p class="text-center text-xs text-gray-500 mt-4">Free shipping on orders over $50</p>
+        </div>
+    </div>
+
+    <script>
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-black/90', 'backdrop-blur-md', 'shadow-lg');
+            } else {
+                navbar.classList.remove('bg-black/90', 'backdrop-blur-md', 'shadow-lg');
+            }
+        });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Cart logic
+        let cart = [];
+        
+        function addToCart(name, price, image) {
+            const existing = cart.find(item => item.name === name);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ name, price, image, quantity: 1 });
+            }
+            updateCart();
+            
+            // Open cart
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-overlay');
+            if (!drawer.classList.contains('open')) {
+                toggleCart();
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function updateQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartFooter = document.getElementById('cart-footer');
+            const cartTotal = document.getElementById('cart-total');
+            const emptyCart = document.getElementById('empty-cart');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            cartCount.textContent = totalItems;
+            cartCount.style.opacity = totalItems > 0 ? '1' : '0';
+
+            if (cart.length === 0) {
+                emptyCart.style.display = 'block';
+                cartFooter.classList.add('hidden');
+                // Clear rendered items but keep empty state
+                const renderedItems = cartItems.querySelectorAll('.cart-item');
+                renderedItems.forEach(el => el.remove());
+            } else {
+                emptyCart.style.display = 'none';
+                cartFooter.classList.remove('hidden');
+                cartTotal.textContent = `$${totalPrice}`;
+
+                // Re-render
+                const renderedItems = cartItems.querySelectorAll('.cart-item');
+                renderedItems.forEach(el => el.remove());
+
+                cart.forEach((item, index) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'cart-item flex gap-4 bg-white/5 rounded-xl p-4 border border-white/5';
+                    itemEl.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="serif text-white text-lg">${item.name}</h4>
+                            <p class="text-[#d4af37] font-bold">$${item.price}</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <button onclick="updateQuantity(${index}, -1)" class="w-6 h-6 rounded-full bg-white/10 text-white hover:bg-[#d4af37] hover:text-black transition-colors flex items-center justify-center text-sm">−</button>
+                                <span class="text-white text-sm">${item.quantity}</span>
+                                <button onclick="updateQuantity(${index}, 1)" class="w-6 h-6 rounded-full bg-white/10 text-white hover:bg-[#d4af37] hover:text-black transition-colors flex items-center justify-center text-sm">+</button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-gray-500 hover:text-red-400 transition-colors self-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    `;
+                    cartItems.appendChild(itemEl);
+                });
+            }
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-overlay');
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
+```
